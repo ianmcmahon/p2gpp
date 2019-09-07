@@ -40,6 +40,9 @@ func ParseStatement(line string) (*Statement, error) {
 	// catching toolchanges with a special regex
 	toolchangeRE := regexp.MustCompile(`^(T)(\d+)`)
 
+	// catching O-codes with a special regex
+	ocodeRE := regexp.MustCompile(`^(O\d+.*)`)
+
 	// this regex says "line starts with a group which is G, M, or T followed by a
 	// positive real,followed by zero or more whitespace,
 	// optionally followed by a group that starts with A-Z.
@@ -62,6 +65,12 @@ func ParseStatement(line string) (*Statement, error) {
 			return nil, fmt.Errorf("unparsable tool number: '%s' %v", tool[2], err)
 		}
 		stmt.params[tool[1]] = float64(toolNum)
+		return stmt, nil
+	}
+
+	// catching O codes and storing the whole statement as the command, not parsing params
+	if ocodeRE.MatchString(code) {
+		stmt.command = code
 		return stmt, nil
 	}
 
