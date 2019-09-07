@@ -14,6 +14,7 @@ type testLine struct {
 var testLines = []testLine{
 	{"M0", STOPPING},
 	{"T0", TOOLCHANGE},
+	{"O21 D0014", UNKNOWN},
 	{"G4 S0 ; Dwell", NON_MODAL},
 	{"G1  Y142.400", MOTION},
 	{"G1 Z0.40 F10800", MOTION},

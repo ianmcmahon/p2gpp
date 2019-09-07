@@ -43,7 +43,8 @@ func ParseStatement(line string) (*Statement, error) {
 	// this regex says "line starts with a group which is G, M, or T followed by a
 	// positive real,followed by zero or more whitespace,
 	// optionally followed by a group that starts with A-Z.
-	commandRE := regexp.MustCompile(`^([GM][\d.]+)\s*([A-Z].*)?`)
+	// adding support for capturing O codes
+	commandRE := regexp.MustCompile(`^([GMO][\d.]+)\s*([A-Z].*)?`)
 
 	// this regex says "find any group which starts with A-Z followed by zero or more whitespace
 	// followed by an optional - followed by any number of digits or decimal.
