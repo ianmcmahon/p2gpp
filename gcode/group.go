@@ -1,4 +1,4 @@
-package main
+package gcode
 
 import "sync"
 
@@ -6,9 +6,6 @@ import "sync"
 	This is some syntactic sugar for classifying commands into established groups.
 	This comes from https://github.com/synthetos/g2/wiki/GCode-Parsing, who purports
 	to have taken it from the NIST standard.
-
-	I added T0-T4, it's a bit goofy because they're not "real" g-code commands,
-	and they are the only command where the number is a parameter.
 
 	How this works is simple, I'm creating a type called Group which is just an alias
 	for int.  The const section declares all the Group constants, and numbers them
@@ -62,7 +59,7 @@ var groupMemberships = map[Group][]string{
 
 	// M group
 	STOPPING:        []string{"M0", "M1", "M2", "M30", "M60"},
-	TOOLCHANGE:      []string{"M6", "T0", "T1", "T2", "T3"}, // this is hacky, T commands aren't part of the gcode spec, and it's the only command where the number is a parameter
+	TOOLCHANGE:      []string{"M6", "T"},
 	SPINDLE_TURNING: []string{"M3", "M4", "M5"},
 	COOLANT:         []string{"M7", "M8", "M9"}, // special case: M7 and M8 may be active at the same time
 	FRO_ENABLE:      []string{"M48", "M49"},
@@ -85,4 +82,12 @@ func (s *Statement) Group() Group {
 		return group
 	}
 	return UNKNOWN
+}
+
+func (s *Statement) IsMotion() bool {
+	return s.Group() == MOTION
+}
+
+func (s *Statement) IsToolchange() bool {
+	return s.Group() == TOOLCHANGE
 }

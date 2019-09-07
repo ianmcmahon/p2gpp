@@ -1,4 +1,4 @@
-package main
+package gcode
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ var testLines = []testLine{
 func TestParseStatement(t *testing.T) {
 	E := 0.0
 	for _, line := range testLines {
-		stmt := parseStatement(line.line)
+		stmt := ParseStatement(line.line)
 		fmt.Printf("%s\n", stmt)
 		E += stmt.Moved("E")
 	}
@@ -42,7 +42,7 @@ func TestParseStatement(t *testing.T) {
 
 func TestGroupClassification(t *testing.T) {
 	for _, line := range testLines {
-		stmt := parseStatement(line.line)
+		stmt := ParseStatement(line.line)
 		if stmt.Group() != line.expectedGroup {
 			t.Errorf("%s should classify as group %v, but was group %v instead", stmt, stmt.Group(), line.expectedGroup)
 		}
