@@ -9,16 +9,14 @@ import (
 
 // parse a raw line into a Statement object
 func ParseStatement(line string) *Statement {
-	// upcasing the whole line here makes parsing simpler,
-	// means fewer special cases for everything down the road
-	line = strings.ToUpper(line)
-
-	code := strings.TrimSpace(line)
 	comment := ""
 	if i := strings.Index(line, ";"); i >= 0 {
 		code = strings.TrimSpace(line[0:i])
 		comment = strings.TrimSpace(line[i+1:])
 	}
+
+	// upcasing the code here makes parsing simpler, and all downstream code can use exclusively upcase
+	code = strings.ToUpper(code)
 
 	stmt := &Statement{
 		params:  make(map[string]float64, 0),
