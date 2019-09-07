@@ -29,7 +29,12 @@ var testLines = []testLine{
 func TestParseStatement(t *testing.T) {
 	E := 0.0
 	for _, line := range testLines {
-		stmt := ParseStatement(line.line)
+		stmt, err := ParseStatement(line.line)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
 		fmt.Printf("%s\n", stmt)
 		E += stmt.Moved("E")
 	}
@@ -42,7 +47,12 @@ func TestParseStatement(t *testing.T) {
 
 func TestGroupClassification(t *testing.T) {
 	for _, line := range testLines {
-		stmt := ParseStatement(line.line)
+		stmt, err := ParseStatement(line.line)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
 		if stmt.Group() != line.expectedGroup {
 			t.Errorf("%s should classify as group %v, but was group %v instead", stmt, stmt.Group(), line.expectedGroup)
 		}

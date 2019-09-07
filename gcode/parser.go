@@ -8,7 +8,8 @@ import (
 )
 
 // parse a raw line into a Statement object
-func ParseStatement(line string) *Statement {
+func ParseStatement(line string) (*Statement, error) {
+	code := strings.TrimSpace(line)
 	comment := ""
 	if i := strings.Index(line, ";"); i >= 0 {
 		code = strings.TrimSpace(line[0:i])
@@ -24,7 +25,7 @@ func ParseStatement(line string) *Statement {
 	}
 
 	if code == "" {
-		return stmt
+		return stmt, nil
 	}
 
 	// a statement is a sequence of words, not necessarily space separated
@@ -57,19 +58,17 @@ func ParseStatement(line string) *Statement {
 		stmt.command = tool[1] // this should be "T"
 		toolNum, err := strconv.ParseInt(tool[2], 10, 8)
 		if err != nil {
-			panic(fmt.Errorf("unparsable tool number: '%s' %v", tool[2], err))
+			return nil, fmt.Errorf("unparsable tool number: '%s' %v", tool[2], err)
 		}
 		stmt.params[tool[1]] = float64(toolNum)
-		return stmt
+		return stmt, nil
 	}
 
 	// first, pull the command word off the front
 	matches := commandRE.FindStringSubmatch(code)
 	if len(matches) != 3 { // [ match, group 1 (command), group 2 (params) ]
-		panic(fmt.Errorf("bad match! '%s': %v", line, matches))
+		return nil, fmt.Errorf("bad match! '%s': %v", line, matches)
 	}
-
-	// TODO: this panics on bad parse right now, eventually this will need to return an error
 
 	stmt.command = matches[1]
 
@@ -80,10 +79,10 @@ func ParseStatement(line string) *Statement {
 		number := m[2]
 		value, err := strconv.ParseFloat(number, 64)
 		if err != nil {
-			panic(fmt.Errorf("bad param! '%s': %s: %v\n", line, m[0], err))
+			return nil, fmt.Errorf("bad param! '%s': %s: %v", line, m[0], err)
 		}
 		stmt.params[letter] = value
 	}
 
-	return stmt
+	return stmt, nil
 }
