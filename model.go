@@ -2,12 +2,27 @@ package main
 
 import "fmt"
 
-type Command interface {
-	String() string
+type Statement struct {
+	code    string
+	comment string
+
+	command string
+	params  map[string]float64
+}
+
+func (s *Statement) String() string {
+	if s.comment == "" {
+		return fmt.Sprintf("%s\n", s.code)
+	}
+	return fmt.Sprintf("%s ; %s\n", s.code, s.comment)
+}
+
+func (s *Statement) IsMove() bool {
+	return false
 }
 
 type Block interface {
-	Lines() []Command
+	Lines() []*Statement
 }
 
 type StartCode struct{}
@@ -23,60 +38,26 @@ type UnifiedGCode struct {
 	endCode   Block
 }
 
-//
-
-type basicCommand struct {
-	operation string
-	comment   string
-}
-
-func (c *basicCommand) String() string {
-	if c.comment == "" {
-		return fmt.Sprintf("%s\n", c.operation)
-	}
-	return fmt.Sprintf("%s ; %s\n", c.operation, c.comment)
-}
-
-type commentCommand struct {
-	comment string
-}
-
-func (c *commentCommand) String() string {
-	return fmt.Sprintf("; %s\n", c.comment)
-}
-
-type movementCommand struct {
-	operation string
-	comment   string
-}
-
-func (c *movementCommand) String() string {
-	if c.comment == "" {
-		return fmt.Sprintf("%s\n", c.operation)
-	}
-	return fmt.Sprintf("%s ; %s\n", c.operation, c.comment)
-}
-
 type metaBlock struct {
-	lines []Command
+	lines []*Statement
 }
 
-func (b *metaBlock) Lines() []Command {
+func (b *metaBlock) Lines() []*Statement {
 	return b.lines
 }
 
 type purgeBlock struct {
-	lines []Command
+	lines []*Statement
 }
 
-func (b *purgeBlock) Lines() []Command {
+func (b *purgeBlock) Lines() []*Statement {
 	return b.lines
 }
 
 type modelBlock struct {
-	lines []Command
+	lines []*Statement
 }
 
-func (b *modelBlock) Lines() []Command {
+func (b *modelBlock) Lines() []*Statement {
 	return b.lines
 }

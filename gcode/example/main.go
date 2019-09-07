@@ -49,7 +49,11 @@ func parseFile(filename string) ([]*gcode.Statement, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		statements = append(statements, gcode.ParseStatement(line))
+		stmts, err := gcode.ParseStatement(line)
+		if err != nil {
+			return nil, err
+		}
+		statements = append(statements, stmts)
 	}
 
 	return statements, nil

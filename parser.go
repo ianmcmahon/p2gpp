@@ -8,7 +8,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 // Parse the source file into a sort of tree of relocatable blocks of gcode.
@@ -62,34 +61,16 @@ func parseFile(filename string) (*UnifiedGCode, error) {
 	return gCode, nil
 }
 
-// parse a raw line into a Command object
-func (g *UnifiedGCode) parseCommand(line string) Command {
-	operation := strings.TrimSpace(line)
-	comment := ""
-	if i := strings.Index(line, ";"); i >= 0 {
-		operation = strings.TrimSpace(line[0:i])
-		comment = strings.TrimSpace(line[i+1:])
-	}
-
-	if operation == "" {
-		return &commentCommand{comment}
-	}
-
-	cmd := &basicCommand{operation, comment}
-
-	return cmd
-}
-
 // parse a bufferful of gcode into a Block, which
-// is an ordered list of Commands
+// is an ordered list of Statement
 func (g *UnifiedGCode) parseBlock(in io.Reader) (Block, error) {
 	block := &metaBlock{
-		lines: make([]Command, 0),
+		lines: make([]*Statement, 0),
 	}
 
 	scanner := bufio.NewScanner(in)
 	for scanner.Scan() {
-		command := g.parseCommand(scanner.Text())
+		command := parseStatement(scanner.Text())
 		block.lines = append(block.lines, command)
 	}
 
@@ -184,10 +165,10 @@ func (g *UnifiedGCode) parseLayer(in io.Reader) (*Layer, error) {
 
 func (g *UnifiedGCode) parseModelBlock(lines []string) *modelBlock {
 	b := &modelBlock{
-		lines: make([]Command, 0),
+		lines: make([]*Statement, 0),
 	}
 	for _, line := range lines {
-		b.lines = append(b.lines, g.parseCommand(line))
+		b.lines = append(b.lines, parseStatement(line))
 	}
 
 	return b
@@ -195,10 +176,10 @@ func (g *UnifiedGCode) parseModelBlock(lines []string) *modelBlock {
 
 func (g *UnifiedGCode) parsePurgeBlock(lines []string) *purgeBlock {
 	b := &purgeBlock{
-		lines: make([]Command, 0),
+		lines: make([]*Statement, 0),
 	}
 	for _, line := range lines {
-		b.lines = append(b.lines, g.parseCommand(line))
+		b.lines = append(b.lines, parseStatement(line))
 	}
 
 	return b
