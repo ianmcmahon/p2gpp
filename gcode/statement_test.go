@@ -15,6 +15,7 @@ var testLines = []testLine{
 	{"M0", STOPPING},
 	{"T0", TOOLCHANGE},
 	{"O21 D0014", UNKNOWN},
+	{"M115 U3.7.2", UNKNOWN},
 	{"O1 Dsometext", UNKNOWN},
 	{"O30 D0 D42ff1e6f", UNKNOWN},
 	{"G4 S0 ; Dwell", NON_MODAL},
