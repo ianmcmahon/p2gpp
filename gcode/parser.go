@@ -88,7 +88,10 @@ func ParseStatement(line string) (*Statement, error) {
 		number := m[2]
 		value, err := strconv.ParseFloat(number, 64)
 		if err != nil {
-			return nil, fmt.Errorf("bad param! '%s': %s: %v", line, m[0], err)
+			// if we can't parse a param, add it to the code.  This is kinda hacky and may need revision, but it is
+			// needed to catch some goofy edge cases without special casing them all directly
+			stmt.command = fmt.Sprintf("%s %s", stmt.command, m[0])
+			continue
 		}
 		stmt.params[letter] = value
 	}
